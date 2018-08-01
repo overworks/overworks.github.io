@@ -21,15 +21,27 @@ baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://overworks.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: lostland
 github_username: overworks
+rss: rss
 timezone: Asia/Seoul
-disqus:
-  shortname: overworks-lab
 
 # Build settings
 markdown: kramdown
 theme: minima
 plugins:
   - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jemoji
+  - jekyll-mentions
+
+# Disqus setting
+disqus:
+  shortname: overworks-lab
+
+# SEO Tags setting
+twitter:
+  username: overworks
+  card: summary
 
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
