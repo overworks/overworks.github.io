@@ -95,7 +95,7 @@ public class EnumeratorUpdate : MonoBehaviour
 보시다시피 foreach 내부에서 enumerator를 Dispose() 해주고 있습니다. foreach는 enumerator가 IDisposable을 구현했을때 Dispose() 처리를 해주도록 되어있습니다. 따라서 올바른 foreach의 구현은 다음과 같이 되어야합니다.
 
 ```C#
-var enumerator = strs.GetEnumerator();
+var enumerator = list.GetEnumerator();
 try
 {
     while (enumerator.MoveNext())
@@ -122,10 +122,10 @@ finally
 
 ![foreach_vs_enumerator_mobile]({{ site.url }}/assets/foreach_vs_enumerator_mobile.PNG)
 
-사실, 과거의 유니티에서 foreach를 돌릴때마다 가비지가 생성되는 원인도 바로 여기에 있었습니다. Dispose()를 호출할때 값 타입인 List\<T\>.Enumerator()을 참조 타입인 박싱하면서 가비지도 발생하고 느려지는 것입니다.[^2] 이 문제는 유니티 5.5에서 수정되어 최신버전에서는 더 이상 발생하지 않습니다.
+사실, 과거의 유니티에서 foreach를 돌릴때마다 가비지가 생성되는 문제의 원인도 바로 여기에 있었습니다. Dispose()를 호출할때 값 타입인 List\<T\>.Enumerator을 참조 타입으로 캐스팅하면서 박싱이 발생하고, 이것이 가비지를 발생시키며 타 루프보다 느려지게 만드는 것입니다.[^2] 이 문제는 유니티 5.5에서 수정되어 최신버전에서는 더 이상 발생하지 않습니다.
 
 [^2]: [이 영상](https://www.youtube.com/watch?v=WgEz6DutNkM)을 참조하시기 바랍니다.
 
 # 결론
 
-enumerator를 사용하면서 Dispose() 과정을 제외시킨다면 여전히 foreach를 사용하는 것보다 더 빠를 것입니다. 하지만 예외안정성을 생각하면 enumerator 대신 foreach 루프를 사용하는 것을 추천하고 싶습니다.
+여전히 최고의 루프는 for입니다. 하지만 이제는 foreach가 enumerator보다 떨어진다고 말할 수 없습니다. enumerator를 사용하면서 Dispose() 과정을 제외시킨다면 여전히 foreach를 사용하는 것보다 더 빠를 것입니다. 하지만 가독성과 예외안정성을 생각하면 enumerator 대신 foreach 루프를 사용하는 것을 추천하고 싶습니다.
