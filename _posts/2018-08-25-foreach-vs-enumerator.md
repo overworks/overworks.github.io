@@ -82,7 +82,7 @@ public class EnumeratorUpdate : MonoBehaviour
 
 그리고 프로파일링을 해본 결과는 다음과 같습니다.
 
-![foreach_vs_enumerator_1]({{ "/assets/foreach_vs_enumerator_1.png" | absolute_url }})
+![foreach_vs_enumerator_1]({{ site.url }}/assets/foreach_vs_enumerator_1.png)
 
 보시다시피 더이상은 리스트에 foreach를 사용해도 가비지가 생성되지 않습니다. 그리고 여전히 아주 적은 차이이지만 foreach가 enumerator보다 조금 느립니다.
 
@@ -90,7 +90,7 @@ public class EnumeratorUpdate : MonoBehaviour
 
 사실 foreach는 enumerator를 사용한 루프의 syntax sugar에 불과합니다. 제대로 IEnumerator 인터페이스를 구현했다면, enumerator를 사용하나 foreach를 사용하나 같은 결과가 나와야합니다. 그렇다면 왜 이런 차이가 발생했을까요? 내부를 한번 더 까보면 그 차이를 알 수 있습니다.
 
-![foreach_vs_enumerator_2]({{ "/assets/foreach_vs_enumerator_2.png" | absolute_url }})
+![foreach_vs_enumerator_2]({{ site.url }}/assets/foreach_vs_enumerator_2.png)
 
 보시다시피 foreach 내부에서 enumerator를 Dispose() 해주고 있습니다. foreach는 enumerator가 IDisposable을 구현했을때 Dispose() 처리를 해주도록 되어있습니다. 따라서 올바른 foreach의 구현은 다음과 같이 되어야합니다.
 
@@ -114,13 +114,13 @@ finally
 
 이에 맞춰서 EnumeratorUpdate.Update()를 바꾸고 다시 한번 프로파일링해본 결과[^1], ForEachUpdate와 EnumeratorUpdate가 엎치락뒤치락하는 것을 알 수 있었습니다.
 
-![foreach_vs_enumerator_3]({{ "/assets/foreach_vs_enumerator_3.png" | absolute_url }})
+![foreach_vs_enumerator_3]({{ site.url }}/assets/foreach_vs_enumerator_3.png)
 
 [^1]: 이때만 경과시간이 길어졌는데, 50개만 넣으니 차이를 알기 어려워서 이 스크린샷을 찍을 때에 5000으로 늘렸습니다.
 
 모바일(갤럭시 노트2)에서도 테스트한 결과도 같았습니다.
 
-![foreach_vs_enumerator_mobile]({{ "/assets/foreach_vs_enumerator_mobile.png" | absolute_url }})
+![foreach_vs_enumerator_mobile]({{ site.url }}/assets/foreach_vs_enumerator_mobile.png)
 
 사실, 과거의 유니티에서 foreach를 돌릴때마다 가비지가 생성되는 원인도 바로 여기에 있었습니다. Dispose()를 호출할때 값 타입인 List\<T\>.Enumerator()을 참조 타입인 박싱하면서 가비지도 발생하고 느려지는 것입니다.[^2] 이 문제는 유니티 5.5(5.6일 수도 있습니다)에서 수정되어 최신버전에서는 더 이상 발생하지 않습니다.
 
