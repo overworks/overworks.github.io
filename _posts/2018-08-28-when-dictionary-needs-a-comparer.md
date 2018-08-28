@@ -8,7 +8,7 @@ comments: true
 
 일반적으로 제네릭 컬렉션의 장점으로 값 타입을 사용해도 박싱이 발생하지 않는다는 것을 꼽습니다. 제네릭이 아닌 컬렉션은 object 타입만을 받고, 값 타입의 컬렉션을 사용하면 박싱-언박싱이 일어나서 퍼포먼스에 영향을 주므로, 가급적이면 제네릭 컬렉션을 사용하는 것을 추천합니다.
 
-하지만 제네릭 컬렉션을 사용하기만 하면 그런 문제를 모두 회피할 수 있는 것은 아닙니다. Dictionay나 HashSet 등, 해시함수를 사용하는 컬렉션은 사용법에 따라 같은 문제가 발생할 수 있습니다. 그럼 어떤 경우에 그렇게 되는지 알아보겠습니다.
+하지만 제네릭 컬렉션을 사용하기만 하면 그런 문제를 모두 회피할 수 있는 것은 아닙니다. Dictionary나 HashSet 등, 해시함수를 사용하는 컬렉션은 사용법에 따라 같은 문제가 발생할 수 있습니다. 어떤 경우에 그렇게 되는지 알아보겠습니다.
 
 테스트 코드는 다음과 같습니다.
 
@@ -128,13 +128,13 @@ IntDictionary에서는 문제가 없으나, EnumDictionary와 StructDictionary�
 
 ![GenericEqualityComparer 구현]({{ site.url }}/assets/generic-equality-comparer.png)
 
-코드는 별 차이가 없습니다. 비교자 자체가 원인은 아닌것 같군요.
+코드는 별 차이가 없습니다. 비교자 자체가 원인은 아닌것 같습니다.
 
-문제는 비교자에서 사용하는 두 메서드, Equals()와 GetHashCode()니다. int가 System.Int32에 대응이 되듯, struct는 System.ValueType 클래스에, enum은 System.Enum 클래스에 대응되는데, 두 클래스 모두 Equals()와 GetHashCode()의 인수로 object를 받습니다.[^1] 즉, 인수를 넘기는 순간 박싱이 일어난다는 이야기입니다.
+문제는 비교자에서 사용하는 두 메서드, Equals()와 GetHashCode()입니다. int가 System.Int32에 대응이 되듯, struct는 System.ValueType 클래스에, enum은 System.Enum 클래스에 대응되는데, 두 클래스 모두 Equals()와 GetHashCode()의 인수로 object를 받습니다.[^1] 즉, 인수를 넘기는 순간 박싱이 일어난다는 이야기입니다.
 
 [^1]: GetHashCode() 자체에는 인수가 없으나, 내부의 비공개 메서드로 넘길때 object 타입을 사용합니다.
 
-이제 원인을 알았으니 문제를 해결해봅시다.
+원인을 알았으니 이제 문제를 해결해보겠습니다.
 
 ### key로 내장타입만을 사용한다
 
