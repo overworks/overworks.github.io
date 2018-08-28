@@ -128,4 +128,4 @@ finally
 
 # 결론
 
-여전히 최고의 루프는 for입니다. 하지만 이제는 foreach가 enumerator보다 떨어진다고 말할 수 없습니다. enumerator를 사용하면서 Dispose() 과정을 제외시킨다면 여전히 foreach를 사용하는 것보다 더 빠를 것입니다. 하지만 가독성과 예외안정성을 생각하면 enumerator 대신 foreach 루프를 사용하는 것을 추천하고 싶습니다.
+여전히 최고의 루프는 for입니다. 하지만 for를 사용할 수 없는 상황이라면 이제는 foreach 대신 enumerator를 사용해야 할 필요가 없습니다. enumerator를 사용하면서 Dispose() 과정을 제외시킨다면 여전히 foreach를 사용하는 것보다 더 빠르겠지만, 가독성과 예외안정성을 생각하면 enumerator 대신 foreach 루프를 사용하는 것을 추천하고 싶습니다.
