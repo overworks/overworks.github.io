@@ -116,7 +116,7 @@ public class StructDictionary : MonoBehaviour
 
 ![기본 Dictionary 생성자 사용시 프로파일링 결과]({{ site.url }}/assets/dictionary-garbage-default.png)
 
-IntDictionary에서는 문제가 없으나, EnumDictionary와 StructDictionary에서는 매프레임 300바이트, TryGetValue() 호출 한번당 60바이트의 가비지가 생성되고 있습니다. 속도도 두배 정도 느리고요.
+IntDictionary에서는 문제가 없으나, EnumDictionary와 StructDictionary에서는 매프레임 300바이트, TryGetValue() 호출 한번당 60바이트의 가비지가 생성되고 있습니다. 속도도 두배 정도 느립니다. 박싱이 발생하고 있다는 것을 예측할 수 있습니다.
 
 ![기본 Dictionary 생성자 사용시 비교자]({{ site.url }}/assets/dictionary-garbage-inner.png)
 
@@ -125,6 +125,7 @@ IntDictionary에서는 문제가 없으나, EnumDictionary와 StructDictionary�
 [ILSpy](https://github.com/icsharpcode/ILSpy)로 유니티의 Mono 구현 내부를 까보겠습니다. ILSpy로 유니티 에디터 설치 폴더/Editor/Data/Mono/lib/mono/unity/mscorlib.dll 파일을 엽니다. GenericEquilityComparer는 System.Collection.Generic 네임스페이스에 있고, DefaultComparer는 EquiltyComparer 클래스에 내부 클래스로 구현되어 있습니다.
 
 ![DefaultComparer 구현]({{ site.url }}/assets/default-comparer.png)
+
 ![GenericEqualityComparer 구현]({{ site.url }}/assets/generic-equality-comparer.png)
 
 코드는 별 차이가 없습니다. 비교자 자체가 원인은 아닌것 같군요.
