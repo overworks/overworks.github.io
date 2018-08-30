@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "그때는 맞고 지금은 틀리다 - 문자열 연결 시에 가장 효율적인 방법은 StringBuilder가 아닐 수도 있다
+title: "그때는 맞고 지금은 틀리다 - 문자열 연결 시에 가장 효율적인 방법은 StringBuilder가 아닐 수도 있다"
 categories: unity
 comments: true
 ---
