@@ -92,39 +92,33 @@ public class EnumeratorUpdate : MonoBehaviour
 
 ![foreach_vs_enumerator_2]({{ site.url }}/assets/foreach_vs_enumerator_2.PNG)
 
-보시다시피 foreach 내부에서 enumerator를 Dispose() 해주고 있습니다. foreach는 enumerator가 IDisposable을 구현했을때 Dispose() 처리를 해주도록 되어있습니다. 따라서 올바른 foreach의 구현은 다음과 같이 되어야합니다.
+보시다시피 foreach 내부에서 enumerator를 Dispose() 해주고 있습니다. IEnumerator는 IDisposable도 같이 받고 있으며, foreach는 종료시에 Dispose() 처리를 해주도록 되어있습니다. 따라서 올바른 foreach의 구현은 다음과 같이 되어야합니다.[^1]
 
 ```C#
-var enumerator = list.GetEnumerator();
-try
+using (enumerator = list.GetEnumerator())
 {
     while (enumerator.MoveNext())
     {
         string str = enumerator.Current;
     }
 }
-finally
-{
-    if (enumerator is System.IDisposable)
-    {
-        enumerator.Dispose();
-    }
-}
 ```
 
-이에 맞춰서 EnumeratorUpdate.Update()를 바꾸고 다시 한번 프로파일링해본 결과[^1], ForEachUpdate와 EnumeratorUpdate가 엎치락뒤치락하는 것을 알 수 있었습니다.
+이에 맞춰서 EnumeratorUpdate.Update()를 바꾸고 다시 한번 프로파일링해본 결과[^2], ForEachUpdate와 EnumeratorUpdate가 엎치락뒤치락하는 것을 알 수 있었습니다.
 
 ![foreach_vs_enumerator_3]({{ site.url }}/assets/foreach_vs_enumerator_3.PNG)
-
-[^1]: 이때만 경과시간이 길어졌는데, 50개만 넣으니 차이를 알기 어려워서 이 스크린샷을 찍을 때에 5000으로 늘렸습니다.
 
 모바일(갤럭시 노트2)에서도 테스트한 결과도 같았습니다.
 
 ![foreach_vs_enumerator_mobile]({{ site.url }}/assets/foreach_vs_enumerator_mobile.PNG)
 
-사실, 과거의 유니티에서 foreach를 돌릴때마다 가비지가 생성되는 문제의 원인도 바로 여기에 있었습니다. Dispose()를 호출할때 값 타입인 List\<T\>.Enumerator을 참조 타입으로 캐스팅하면서 박싱이 발생하고, 이것이 가비지를 발생시키며 타 루프보다 느려지게 만드는 것입니다.[^2] 이 문제는 유니티 5.5에서 수정되어 최신버전에서는 더 이상 발생하지 않습니다.
+사실, 과거의 유니티에서 foreach를 돌릴때마다 가비지가 생성되는 문제의 원인도 바로 여기에 있었습니다. Dispose()를 호출할때 값 타입인 List\<T\>.Enumerator을 참조 타입으로 캐스팅하면서 박싱이 발생하고, 이것이 가비지를 발생시키며 타 루프보다 느려지게 만드는 것입니다.[^3] 이 문제는 유니티 5.5에서 수정되어 최신버전에서는 더 이상 발생하지 않습니다.
 
-[^2]: [이 영상](https://www.youtube.com/watch?v=WgEz6DutNkM)을 참조하시기 바랍니다.
+[^1]: 기존 문서에서는 try/finally를 사용했으나, using을 사용하는 것으로 변경했습니다. 코드 변경에 따른 수행시간의 유의미한 차이는 없었습니다.
+
+[^2]: 이때만 경과시간이 길어졌는데, 50개만 넣으니 차이를 알기 어려워서 이 스크린샷을 찍을 때에 5000으로 늘렸습니다.
+
+[^3]: [이 영상](https://www.youtube.com/watch?v=WgEz6DutNkM)을 참조하시기 바랍니다.
 
 # 결론
 
