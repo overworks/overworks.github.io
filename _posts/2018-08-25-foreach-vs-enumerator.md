@@ -95,7 +95,7 @@ public class EnumeratorUpdate : MonoBehaviour
 보시다시피 foreach 내부에서 enumerator를 Dispose() 해주고 있습니다. IEnumerator는 IDisposable도 같이 받고 있으며, foreach는 종료시에 Dispose() 처리를 해주도록 되어있습니다. 따라서 올바른 foreach의 구현은 다음과 같이 되어야합니다.[^1]
 
 ```C#
-using (enumerator = list.GetEnumerator())
+using (var enumerator = list.GetEnumerator())
 {
     while (enumerator.MoveNext())
     {
