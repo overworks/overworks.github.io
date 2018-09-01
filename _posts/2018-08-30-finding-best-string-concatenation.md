@@ -4,9 +4,11 @@ title: "그때는 맞고 지금은 틀리다 - 문자열 연결 시에 가장 �
 categories: unity
 comments: true
 ---
+**StringBuilder.AppendFormat()에 대한 설명에 잘못된 점이 있어 수정했습니다. (2018.9.1)**
+
 많은 분들이 아시듯이 C#의 string은 불변객체입니다. 한번 문자열이 지정되고 난 이후에는 변경이 불가능합니다. Replace()이나 \+= 연산자등은 문자열 내부의 값을 바꾸는 것이 아니라, 새로운 문자열을 생성한 후 반환하는 것입니다. 그래서 C#의 최적화에 관련된 글들을 보면, 문자열 결합이 필요한 경우 결합 연산자 사용을 지양하고, string.Format() 메서드로 포매팅한 문자열을 사용하거나 내부에 버퍼를 가진 StringBuilder 클래스를 사용하는 것을 권장하고 있습니다.
 
-"그러니 문자열을 자주 연결할 일이 있으면 무조건 StringBuilder!"로 끝난다면 참 편하겠습니다만... 때로는 오히려 StringBuilder를 사용하는 것이 더 비효율적일 수 있습니다. 제가 알고 있는 범위 내에서, 문자열 결합에 가장 효율적인 방법을 적어보겠습니다.
+"그러니 문자열을 자주 연결할 일이 있으면 무조건 StringBuilder!"로 모두 해결된다면 참 편하겠습니다만... 때로는 오히려 StringBuilder를 사용하는 것이 더 비효율적일 수 있습니다. 제가 알고 있는 범위 내에서, 문자열 결합에 가장 효율적인 방법을 적어보겠습니다.
 
 ## 리터럴 문자열을 결합하는 경우에는 그냥 + 연산자로 연결
 
@@ -42,18 +44,19 @@ string appendString1 = "기본 용량 16자가 넘는 문자열을 추가합니�
 string appendString2 = "한번 더 문자열을 추가합니다.";
 string appendString3 = "다시 한번 문자열을 추가합니다.";
 
-Debug.LogFormat("string size: {0}, {1}, {2}", appendString1.Length, appendString2.Length, appendString3.Length);
+// ToString()을 해서 넣는 이유는 나중에 설명합니다.
+Debug.LogFormat("string size: {0}, {1}, {2}", appendString1.Length.ToString(), appendString2.Length.ToString(), appendString3.Length.ToString());
 
 StringBuilder sb = new StringBuilder();
 int capacity0 = sb.Capacity; // 여기서는 16이라고 나오는데 실제 Capacity는 0입니다. Mono 구현이 그렇게 되어있음.
-sb.Append(appendString1);    // Mono에서는 여기에서 처음으로 문자열 크기 만큼의 버퍼 할당이 됩니다.
+sb.Append(appendString1);    // 여기에서 처음으로 문자열 크기 만큼의 버퍼 할당이 됩니다.
 int capacity1 = sb.Capacity;
 sb.Append(appendString2);    // 용량을 초과했으므로 재할당이 일어납니다.
 int capacity2 = sb.Capacity;
 sb.Append(appendString3);    // 다시 두배로 늘어납니다.
 int capacity3 = sb.Capacity;
 
-Debug.LogFormat("capacity0: {0}, capacity1: {1}, capacity2: {2}, capacity3: {3}", capacity0, capacity1, capacity2, capacity3);
+Debug.LogFormat("capacity0: {0}, capacity1: {1}, capacity2: {2}, capacity3: {3}", capacity0.ToString(), capacity1.ToString(), capacity2.ToString(), capacity3.ToString());
 ```
 
 ![StringBuilder 기본 생성자 사용시 결과]({{ site.url }}/assets/stringbuilder-capacity1.png)
@@ -65,7 +68,7 @@ string appendString1 = "기본 용량 16자가 넘는 문자열을 추가합니�
 string appendString2 = "한번 더 문자열을 추가합니다.";
 string appendString3 = "다시 한번 문자열을 추가합니다.";
 
-Debug.LogFormat("string size: {0}, {1}, {2}", appendString1.Length, appendString2.Length, appendString3.Length);
+Debug.LogFormat("string size: {0}, {1}, {2}", appendString1.Length.ToString(), appendString2.Length.ToString(), appendString3.Length.ToString());
 
 StringBuilder sb = new StringBuilder(128); // 미리 버퍼를 할당해둡니다.
 int capacity0 = sb.Capacity;
@@ -76,7 +79,7 @@ int capacity2 = sb.Capacity;
 sb.Append(appendString3);
 int capacity3 = sb.Capacity;
 
-Debug.LogFormat("capacity0: {0}, capacity1: {1}, capacity2: {2}, capacity3: {3}", capacity0, capacity1, capacity2, capacity3);
+Debug.LogFormat("capacity0: {0}, capacity1: {1}, capacity2: {2}, capacity3: {3}", capacity0.ToString(), capacity1.ToString(), capacity2.ToString(), capacity3.ToString());
 ```
 
 ![StringBuilder 할당 생성자 사용시 결과]({{ site.url }}/assets/stringbuilder-capacity2.png)
@@ -86,9 +89,9 @@ Debug.LogFormat("capacity0: {0}, capacity1: {1}, capacity2: {2}, capacity3: {3}"
 
 ## StringBuilder.AppendFormat()과 string.Format()
 
-string.Format은 내부적으로 StringBuilder 객체를 생성하여 처리하도록 되어있고, StringBuilder.AppendFormat()은 반대로 string.Format(정확히는 string.Format()이 호출하는 내부 메서드)을 호출하는 식으로 구현되어 있습니다. 즉, StringBuilder.AppendFormat()은 StringBuilder 객체를 하나 더 생성하게 되고, 직접 하나씩 Append()로 넣는 것보다 훨씬 큰 오버헤드가 발생합니다.
+string.Format은 내부적으로 StringBuilder 객체를 생성하여 처리하도록 되어있고, StringBuilder.AppendFormat()은 반대로 string.Format(정확히는 string.Format()이 호출하는 내부 메서드)을 호출하는 식으로 구현되어 있습니다. ~~즉, StringBuilder.AppendFormat()은 StringBuilder 객체를 하나 더 생성하게 되고, 직접 하나씩 Append()로 넣는 것보다 훨씬 큰 오버헤드가 발생합니다.~~[^3] [^4]
 
-또, 이러한 포매팅 문자열을 사용하는 메서드들은 인수타입이 object로 되어 있습니다. 즉, 값 타입을 사용할 경우 자연스럽게 박싱이 발생하게 됩니다.[^3] 이런 오버헤드를 줄이기 위해서는 넣기 전에 미리 ToString() 메서드를 호출하여 레퍼런스 타입으로 변경하는 것이 좋습니다.
+또, 이러한 포매팅 문자열을 사용하는 메서드들은 인수타입이 object로 되어 있습니다. 즉, 값 타입을 사용할 경우 자연스럽게 박싱이 발생하게 됩니다.[^5] 이런 오버헤드를 줄이기 위해서는 넣기 전에 미리 ToString() 메서드를 호출하여 참조 타입으로 변경하는 것이 좋습니다.
 
 ```C#
 int gold = 500;
@@ -101,7 +104,9 @@ string targetString3 = $"ruby: {ruby}"; // C# 6에서 추가된 문자열 보간
 string targetString4 = $"ruby: {ruby.ToString()}"; // 이곳에서도 마찬가지로 미리 변환해줌
 ```
 
-[^3]: StringBuiler.Append()는 대부분의 내장타입이 오버로드되어있어 이런 문제가 발생할 가능성이 적습니다. 물론 enum이나 struct를 사용하면 같은 문제가 발생하게 됩니다.
+[^3]: 기존 문서에 오류가 있었습니다. string.Format()과 StringBuilder.AppendFormat() 사용시 string.FormatHelper()라는 내부 메서드를 통해 StringBuilder.Append() 처리를 하는데, string.Format() 사용시에는 StringBuilder 객체를 생성하나 StringBuilder.AppendFormat()은 자기자신을 넘겨주기 때문에 새로운 객체가 생성되지는 않습니다.
+[^4]: 위 주석의 설명은 유니티에서 사용하는 모노의 구현방식으로, 닷넷에서는 StringBuilder.AppendFormat()에서 string.FormatHelper()으로 넘겨주는 것이 아니라 StringBuilder.AppendFormat()에서 바로 처리하고, string.Format()도 StringBuilder.AppendFormat()로 넘겨줍니다. 최신버전의 모노에서도 닷넷과 같은 방식으로 바뀌었습니다.
+[^5]: StringBuilder.Append()는 대부분의 내장타입이 오버로드되어있어 이런 문제가 발생할 가능성이 적습니다. 물론 enum이나 struct를 사용하면 같은 문제가 발생하게 됩니다.
 
 ## 벤치마크
 
@@ -204,4 +209,4 @@ public class StringTest : MonoBehaviour
  1. 리터럴 문자열끼리 연결할 때에는 오버헤드가 없다.
  2. 4개 이하의 문자열을 연결할때는 \+ 연산자를 사용하자. 그보다 조금 많아도 괜찮다.
  3. StringBuilder를 사용할때에는 미리 사용할 크기를 지정해두자.
- 4. 문자열 포매팅은 매우 비효율적이다. 굳이 사용할때에는 미리 ToString()을 해서 박싱이 발생하지 않도록 하자.
+ 4. 문자열 포매팅은 가장 비효율적인 방법이다. 굳이 사용할 때에는 미리 ToString()을 해서 박싱이 발생하지 않도록 하자.
