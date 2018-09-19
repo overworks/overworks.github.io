@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "로컬에 Jekyll 설치 후 GitHub Pages 플러그인 설정 방법"
-categories: jekyll
+categories: Jekyll
 comments: true
 ---
 1. Gemfile을 열고 `gem "jekyll"`(뒤에 버전이 지정되어 있을수도 있음) 행을 주석화.

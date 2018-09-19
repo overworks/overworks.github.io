@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "그때는 맞고 지금은 틀리다 - 문자열 연결 시에 가장 효율적인 방법은 StringBuilder가 아닐 수도 있다"
-categories: unity
+categories: Unity
 comments: true
 ---
 **StringBuilder.AppendFormat()에 대한 설명에 잘못된 점이 있어 수정했습니다. (2018.9.1)**

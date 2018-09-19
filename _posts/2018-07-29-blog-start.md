@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "블로그 개설"
-categories: update
+categories: Update
 comments: true
 ---
 마크다운으로 쓸 수 있는 블로그를 찾다가 결국 [Jekyll](https://jekyllrb.com/)도 써볼겸 GitHub Pages에 만들었습니다.
