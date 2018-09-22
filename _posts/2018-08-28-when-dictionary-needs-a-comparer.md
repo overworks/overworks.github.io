@@ -12,107 +12,9 @@ comments: true
 
 테스트 코드는 다음과 같습니다.
 
-```C#
-using System.Collections.Generic;
-using UnityEngine;
-
-public class IntDictionary : MonoBehaviour
-{
-    private Dictionary<int, string> dict = new Dictionary<int, string>();
-
-    private void Start()
-    {
-        for (int i = 0; i < 5; ++i)
-        {
-            dict.Add(i, i.ToString());
-        }
-    }
-
-    private void Update()
-    {
-        string str;
-        for (int i = 0; i < 5; ++i)
-        {
-            dict.TryGetValue(i, out str));
-        }
-    }
-}
-```
-
-```C#
-using System.Collections.Generic;
-using UnityEngine;
-
-public enum Enums
-{
-    Enums0,
-    Enums1,
-    Enums2,
-    Enums3,
-    Enums4,
-
-    Max
-}
-
-public class EnumDictionary : MonoBehaviour
-{
-    Dictionary<Enums, string> dict = new Dictionary<Enums, string>();
-
-    private void Start()
-    {
-        for (int i = 0; i < 5; ++i)
-        {
-            dict.Add((Enums)i, i.ToString());
-        }
-    }
-
-    private void Update()
-    {
-        string str;
-        for (int i = 0; i < 5; ++i)
-        {
-            dict.TryGetValue((Enums)i, out str);
-        }
-    }
-}
-```
-
-```C#
-using System.Collections.Generic;
-using UnityEngine;
-
-public struct Struct
-{
-    public int value;
-
-    public Struct(int value)
-    {
-        this.value = value;
-    }
-}
-
-public class StructDictionary : MonoBehaviour
-{
-    private Dictionary<Struct, string> dict = new Dictionary<Struct, string>();
-
-    private void Start()
-    {
-        for (int i = 0; i < 5; ++i)
-        {
-            dict.Add(new Struct(i), i.ToString());
-        }
-    }
-
-    private void Update()
-    {
-        string str;
-        for (int i = 0; i < 5; ++i)
-        {
-            dict.TryGetValue(new Struct(i), out str);
-        }
-    }
-}
-```
+{% gist ad8fd31e41ecfc6f25a79506b7492323 %}
+{% gist d340d8303dbbfe06bedb8b1039194d05 %}
+{% gist 9b08d265ef77836d7d978a92f9c17f2a %}
 
 ![기본 Dictionary 생성자 사용시 프로파일링 결과]({{ site.url }}/assets/dictionary-garbage-default.png)
 
@@ -144,30 +46,7 @@ IntDictionary에서는 문제가 없으나, EnumDictionary와 StructDictionary�
 
 struct 타입 선언시에 System.IEquatable\<T\> 인터페이스를 받고 Equals()를 구현하고, GetHashCode()를 오버라이딩합니다. 당연히 박싱을 일으키지 않는 형태로 구현되어야 합니다. 위의 StructDictionary 스크립트에서 사용된 Struct 타입을 다시 구현해보겠습니다.
 
-```C#
-using System;
-using System.Collections.Generic;
-
-public struct Struct : IEquatable<Struct>
-{
-    public int value;
-
-    public Struct(int value)
-    {
-        this.value = value;
-    }
-
-    public bool Equals(Struct other)
-    {
-        return value == other.value;
-    }
-
-    public override int GetHashCode()
-    {
-        return value.GetHashCode();
-    }
-}
-```
+{% gist 16c1ea2246db6a00233cb531a67f214e %}
 
 이렇게 하면 더이상 박싱이 발생하지 않습니다. 하지만 이 역시 enum 타입에서는 쓸 수 없다는 단점이 있습니다.
 
@@ -175,83 +54,8 @@ public struct Struct : IEquatable<Struct>
 
 위에서 EqualityComparer.DefaultComparer나 GenericEquilityComparer가 사용된 것은 Dictionary가 생성될 때 비교자를 넘기지 않았기 때문입니다. IEqualityComparer\<T\> 인터페이스를 구현하는 커스텀 비교자를 만들어 생성자 인수로 넘기면 기본 비교자 대신 이것을 사용하게 됩니다. 이 방법을 통해 EnumDictionary와 StructDictionary 스크립트를 다시 작성해보겠습니다.
 
-```C#
-public class EnumDictionary : MonoBehaviour
-{
-    private class EqualityComparer : IEqualityComparer<Enums>
-    {
-        public bool Equals(Enums x, Enums y)
-        {
-            return x == y;
-        }
-
-        public int GetHashCode(Enums obj)
-        {
-            return ((int)obj).GetHashCode();
-        }
-
-        public static EqualityComparer Default = new EqualityComparer();
-    }
-
-    Dictionary<Enums, string> dict = new Dictionary<Enums, string>(EqualityComparer.Default);
-
-    private void Start()
-    {
-        for (int i = 0; i < 5; ++i)
-        {
-            dict.Add((Enums)i, i.ToString());
-        }
-    }
-
-    private void Update()
-    {
-        string str;
-        for (int i = 0; i < 5; ++i)
-        {
-            dict.TryGetValue((Enums)i, out str);
-        }
-    }
-}
-```
-
-```C#
-public class StructDictionary : MonoBehaviour
-{
-    private class EqualityComparer : IEqualityComparer<Struct>
-    {
-        public bool Equals(Struct x, Struct y)
-        {
-            return x.value == y.value;
-        }
-
-        public int GetHashCode(Struct obj)
-        {
-            return obj.value.GetHashCode();
-        }
-
-        public static EqualityComparer Default = new EqualityComparer();
-    }
-
-    private Dictionary<Struct, string> dict = new Dictionary<Struct, string>(EqualityComparer.Default);
-
-    private void Start()
-    {
-        for (int i = 0; i < 5; ++i)
-        {
-            dict.Add(new Struct(i), i.ToString());
-        }
-    }
-
-    private void Update()
-    {
-        string str;
-        for (int i = 0; i < 5; ++i)
-        {
-            dict.TryGetValue(new Struct(i), out str);
-        }
-    }
-}
-```
+{% gist fdb8a78d7e192900fb3fa844c4391bcf %}
+{% gist 17551562caf99f220fedaaf5a89a609e %}
 
 ![커스텀 비교자 사용시 프로파일링 결과]({{ site.url }}/assets/dictionary-garbage-custom.png)
 

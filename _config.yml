@@ -33,6 +33,7 @@ plugins:
   - jekyll-sitemap
   - jemoji
   - jekyll-mentions
+  - jekyll-gist
 
 # Disqus setting
 disqus:
