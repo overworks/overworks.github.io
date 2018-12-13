@@ -14,3 +14,4 @@ Living in Seoul, Republic of Korea.
 - SIMS (Wii, Android)
 - netmarble Npark (Android, iPhone)
 - Entermate (Android, iPhone)
+- Softon Entertainment (PC)
