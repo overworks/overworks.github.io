@@ -20,7 +20,7 @@ NGUI에서는 컬라이더(Collider) 컴포넌트를 붙여서 선택영역을 �
 
 유니티 UI에서 아쉬운 점 중 하나는 선택영역이 따로 분리가 되어있지 않고, [비주얼 컴포넌트](https://docs.unity3d.com/Manual/UIVisualComponents.html)가 영역 지정의 역할을 같이 한다는 것입니다. 일반적인 버튼을 만든다고 할때, 이미지의 크기를 변경하면 선택영역도 그에 맞춰 자동으로 변경됩니다. 보통은 외곽 이미지에 맞추면 큰 문제가 없지만, 때로는 눈에 보이는 것과 실제 영역을 다르게 처리해야할 필요가 있습니다.
 
-![일반적인 버튼 구조]({{ site.url }}/assets/ugui-button-1.png)
+![일반적인 버튼 구조]({{ site.url }}/assets/ugui-button-exam1.png)
 
 ### 선택영역과 비주얼의 분리
 
@@ -28,7 +28,7 @@ NGUI에서는 컬라이더(Collider) 컴포넌트를 붙여서 선택영역을 �
 
 {% gist 7f231f4a0ba826e74bbb5b0bcd71422c %}
 
-![변경된 버튼 구조]({{ site.url }}/assets/ugui-button-2.png)
+![변경된 버튼 구조]({{ site.url }}/assets/ugui-button-exam2.png)
 
 이렇게 하면 선택영역은 보이지 않는 더미 컴포넌트가, 비주얼은 자식 오브젝트가 담당하게 되어 따로 크기를 지정할 수 있게 됩니다.
 
