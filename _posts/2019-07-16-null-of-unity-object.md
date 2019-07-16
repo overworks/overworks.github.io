@@ -14,15 +14,13 @@ comments: true
 
 ![유니티 오브젝트와 닷넷 오브젝트]({{ site.url }}/assets/unity-object-null-is-not-system-object-null.png)
 
-유니티 오브젝트로 판단할때는 null이 되었습니다만, 일반적인 닷넷 오브젝트로 비교하면 null이 아니라고 판단하고 있습니다. 여기서 브레이크포인트를 걸어보면 아래와 같습니다.
+삭제하기는 했으나 해당 변수에 null을 대입하지는 않았기에 닷넷 오브젝트로는 null이 아닌 것으로 표시되고 있으나, 유니티 오브젝트로서 null과 비교를 하면 true를 돌려주고 있습니다. 여기서 브레이크포인트를 걸어보면 아래와 같습니다.
 
 ![유니티 오브젝트의 fake null]({{ site.url }}/assets/unity-object-fake-null.png)
 
-분명 삭제한 오브젝트입니다만, 참조하고 있는 객체가 존재한다는 것을 알 수 있습니다. 물론 이 상태에서 저 유니티 오브젝트를 참조하려고 하면 null 참조 예외가 발생합니다. 어째서 이런 현상이 발생하는 걸까요?
+유니티 오브젝트는 C++로 작성된 네이티브 객체의 래퍼입니다. 이 네이티브 객체는 씬이 변경되거나 Object.Destroy()를 사용하면 제거됩니다만, 그 객체를 C#으로 래핑한 유니티 오브젝트는 가비지 컬렉터가 수집을 완료할 때까지 남아있게 됩니다. 유니티에서는 이 상태를 "fake null"이라고 하고 있습니다. 이런 이유로 UnityEngine.Object 클래스에서는 [같음 연산자(==, !=)](https://docs.microsoft.com/ko-kr/dotnet/csharp/language-reference/operators/equality-operators)를 오버로딩하여 네이티브 객체의 존재 여부까지 판단해서 비교한 후 결과를 돌려주고 있습니다만, 닷넷의 기본 오브젝트로 보았을 때와 결과가 일치하지 않는 문제가 발생합니다.
 
-유니티 오브젝트는 C++로 작성된 네이티브 객체의 래퍼입니다. 이 네이티브 객체는 씬이 변경되거나 Object.Destroy()를 사용하면 제거됩니다만, 그 객체를 C#으로 래핑한 유니티 오브젝트는 가비지 컬렉터가 수집을 완료할 때까지 남아있게 됩니다. 이것을 "fake null"이라고 합니다. 그래서 유니티 측에서는 비교연산자를 오버로딩하여 이미 파괴된 오브젝트인지 체크해가면서 비교를 하고 있습니다만, 위의 예시와 같이 닷넷 베이스 오브젝트로 사용될 경우에는 제대로 체크할 수 없게 됩니다.
-
-또다른 문제는 그렇게 네이티브 리소스가 아직 남아있는지 체크하는 과정 자체가 제법 비싼 작업이라는 것입니다. 예를 들어 transform 속성 호출이 비싼 작업이라는 것은 잘 알려져있기에 다음과 같은 코드를 많이 사용하는데, 실제로는 null 체크 비용 때문에 효과가 없었다는 이야기가 있습니다.
+또다른 문제는 그렇게 네이티브 리소스가 아직 남아있는지 체크하는 과정 자체가 비싼 작업이라는 것입니다. 예를 들어 GetComponent()나 transform 속성 호출이 비싼 작업이라는 것은 잘 알려져있고, 그래서 다음과 같은 코드를 많이 사용하는데, 실제로는 null 체크 비용 때문에 효과가 없었다는 이야기가 있습니다.
 
 ```C#
 private Transform _cachedTransform;
@@ -40,7 +38,7 @@ public Transform cahcedTransform
 }
 ```
 
-실제로 테스트를 해보겠습니다. 다음 두 코드를 별도의 게임오브젝트에 붙이고 결과를 보았습니다.
+실제로 테스트를 해보겠습니다. 다음 두 코드를 서로 다른 게임오브젝트에 붙이고 결과를 보았습니다.
 
 {% gist 62790f972fefac1f4c3322b47e50deb4 %}
 {% gist 66c37689ef899b2575e4d6b1db45357b %}
@@ -49,9 +47,9 @@ public Transform cahcedTransform
 
 ![transform 캐싱 속도 비교]({{ site.url }}/assets/transform-caching-comparision.png)
 
-놀랍게도 직접 transform으로 가져오는 것이 30% 정도 더 빠릅니다. 이 문제는 이런 직접적인 조건문만이 아니라 [null 병합 연산자(::)](https://docs.microsoft.com/ko-kr/dotnet/csharp/language-reference/operators/null-coalescing-operator)나 [null 조건부 연산자(?. 및 ?[])](https://docs.microsoft.com/ko-kr/dotnet/csharp/language-reference/operators/member-access-operators#null-conditional-operators--and-)에도 해당됩니다.
+놀랍게도 직접 transform으로 가져오는 것이 30% 정도 더 빠릅니다. 이 문제는 이런 직접적인 조건문만이 아니라 [null 병합 연산자(::)](https://docs.microsoft.com/ko-kr/dotnet/csharp/language-reference/operators/null-coalescing-operator)나 [null 조건부 연산자(?. 및 ?[])](https://docs.microsoft.com/ko-kr/dotnet/csharp/language-reference/operators/member-access-operators#null-conditional-operators--and-)를 사용하는 경우에도 해당됩니다.
 
-그렇다면 어떻게 하는 것이 좋을까요? 실제로 위의 코드와 같은 경우 어디까지나 비어있는가 아닌가 만을 체크하는 것이지, 딱히 네이티브 리소스가 잘 있나 판단할 필요는 없습니다. 그러므로 닷넷 오브젝트로서 비교를 하면 충분합니다. 다음 코드를 추가하여 비교해보겠습니다.
+그렇다면 어떻게 하는 것이 좋을까요? 위의 코드와 같은 경우 이미 대입이 되어있는지의 여부를 판단하기 위한 것으로, 딱히 네이티브 리소스의 실재 여부까지 볼 필요는 없습니다. 그러므로 유니티 오브젝트의 오버로딩된 연산자를 피하여 원시 오브젝트로 비교합니다. 다음 코드를 추가하여 비교해보겠습니다.
 
 {% gist c152bf2924c78558ff16edd2553eda2b %}
 
@@ -69,7 +67,7 @@ if (bullets[i]) // 암시적 null 체크. bullets[i] != null 과 같음
 }
 ```
 
-## 참고 자료
+### 참고 자료
 
 - [Custom == operator, should we keep it?](https://blogs.unity3d.com/2014/05/16/custom-operator-should-we-keep-it/)
 - [Don't Use == null On Unity Objects](https://jacx.net/2015/11/20/dont-use-equals-null-on-unity-objects.html)
