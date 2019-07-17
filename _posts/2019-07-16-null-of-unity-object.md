@@ -6,7 +6,9 @@ tags: [Unity]
 comments: true
 ---
 
-먼저 아래 코드를 봅시다. 임의의 컴포넌트를 Destroy한 후에 null인지 체크하는 간단한 코드입니다.
+**Update** : null 병합 연산자와 null 조건부 연산자에 대한 서술이 잘못된 점이 있어 수정했습니다. (2019-07-17)
+
+먼저 아래 코드를 봅시다. 임의의 컴포넌트를 Destroy한 후에 null인지 체크하는 간단한 코드입니다. 유니티 버전은 2019.1.6f1, OS는 윈도10 입니다.
 
 {% gist 49b87f57f532e76b630b8383a3e18aed %}
 
@@ -47,7 +49,7 @@ public Transform cahcedTransform
 
 ![transform 캐싱 속도 비교]({{ site.url }}/assets/transform-caching-comparision.png)
 
-놀랍게도 직접 transform으로 가져오는 것이 30% 정도 더 빠릅니다. 이 문제는 이런 직접적인 조건문만이 아니라 [null 병합 연산자(::)](https://docs.microsoft.com/ko-kr/dotnet/csharp/language-reference/operators/null-coalescing-operator)나 [null 조건부 연산자(?. 및 ?[])](https://docs.microsoft.com/ko-kr/dotnet/csharp/language-reference/operators/member-access-operators#null-conditional-operators--and-)를 사용하는 경우에도 해당됩니다.
+놀랍게도 직접 transform으로 가져오는 것이 30% 정도 더 빠릅니다. ~~이 문제는 이런 직접적인 조건문만이 아니라 [null 결합 연산자(::)](https://docs.microsoft.com/ko-kr/dotnet/csharp/language-reference/operators/null-coalescing-operator)나 [null 조건 연산자(?. 및 ?[])](https://docs.microsoft.com/ko-kr/dotnet/csharp/language-reference/operators/member-access-operators#null-conditional-operators--and-)를 사용하는 경우에도 해당됩니다.~~[^1]
 
 그렇다면 어떻게 하는 것이 좋을까요? 위의 코드와 같은 경우 이미 대입이 되어있는지의 여부를 판단하기 위한 것으로, 딱히 네이티브 리소스의 실재 여부까지 볼 필요는 없습니다. 그러므로 유니티 오브젝트의 오버로딩된 연산자를 피하여 원시 오브젝트로 비교합니다. 다음 코드를 추가하여 비교해보겠습니다.
 
@@ -72,3 +74,5 @@ if (bullets[i]) // 암시적 null 체크. bullets[i] != null 과 같음
 - [Custom == operator, should we keep it?](https://blogs.unity3d.com/2014/05/16/custom-operator-should-we-keep-it/)
 - [Don't Use == null On Unity Objects](https://jacx.net/2015/11/20/dont-use-equals-null-on-unity-objects.html)
 - [Possible unintended bypass of lifetime check of underlying Unity engine object](https://github.com/JetBrains/resharper-unity/wiki/Possible-unintended-bypass-of-lifetime-check-of-underlying-Unity-engine-object)
+
+[^1]: [null 결합 연산자(::)](https://docs.microsoft.com/ko-kr/dotnet/csharp/language-reference/operators/null-coalescing-operator)와 [null 조건 연산자(?. 및 ?[])](https://docs.microsoft.com/ko-kr/dotnet/csharp/language-reference/operators/member-access-operators#null-conditional-operators--and-)는 오버로딩된 UnityEngine.Object의 연산자를 사용하지 않기 때문에 네이티브 리소스 확인 비용이 들지 않습니다. 오히려 object.ReferenceEquals()로 비교 후 호출하는 것보다 더 빠릅니다. 대신 destroyed된 유니티 오브젝트에 사용되면 null이 아니라고 판단하게 되고, fake null 상태인 유니티 오브젝트는 MissingReferenceException을 발생시킵니다.
