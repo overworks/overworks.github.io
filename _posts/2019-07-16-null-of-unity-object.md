@@ -1,12 +1,12 @@
 ---
 layout: post
 title: "유니티 오브젝트의 null 비교 시 유의사항"
-categories: Unity
+categories: [Unity]
 tags: [Unity]
 comments: true
 ---
 
-**Update** : null 병합 연산자와 null 조건부 연산자에 대한 서술이 잘못된 점이 있어 수정했습니다. (2019-07-18)
+**Update** : null 병합 연산자와 null 조건부 연산자에 대한 서술이 잘못된 점이 있어 수정했습니다. (2019-07-17)
 
 먼저 아래 코드를 봅시다. 임의의 컴포넌트를 Destroy한 후에 null인지 체크하는 간단한 코드입니다. 유니티 버전은 2019.1.6f1, OS는 윈도10 입니다.
 
@@ -16,18 +16,18 @@ comments: true
 
 ![유니티 오브젝트와 닷넷 오브젝트]({{ site.url }}/assets/unity-object-null-is-not-system-object-null.png)
 
-삭제하기는 했으나 해당 변수에 null을 대입하지는 않았기에 닷넷 오브젝트로는 null이 아닌 것으로 표시되고 있으나, 유니티 오브젝트로서 null과 비교를 하면 true를 돌려주고 있습니다. 여기서 브레이크포인트를 걸어보면 아래와 같습니다.
+삭제하기는 했으나 해당 변수에 null을 대입하지는 않았기에 닷넷 오브젝트로는 null이 아닌 것으로 표시되고 있는 한편, 유니티 오브젝트로서 null과 비교를 하면 true를 돌려주고 있습니다. 여기서 브레이크포인트를 걸어보면 아래와 같습니다.
 
 ![유니티 오브젝트의 fake null]({{ site.url }}/assets/unity-object-fake-null.png)
 
 유니티 오브젝트는 C++로 작성된 네이티브 객체의 래퍼입니다. 이 네이티브 객체는 씬이 변경되거나 Object.Destroy()를 사용하면 제거됩니다만, 그 객체를 C#으로 래핑한 유니티 오브젝트는 가비지 컬렉터가 수집을 완료할 때까지 남아있게 됩니다. 유니티에서는 이 상태를 "fake null"이라고 하고 있습니다. 이런 이유로 UnityEngine.Object 클래스에서는 [같음 연산자(==, !=)](https://docs.microsoft.com/ko-kr/dotnet/csharp/language-reference/operators/equality-operators)를 오버로딩하여 네이티브 객체의 존재 여부까지 판단해서 비교한 후 결과를 돌려주고 있습니다만, 닷넷의 기본 오브젝트로 보았을 때와 결과가 일치하지 않는 문제가 발생합니다.
 
-또다른 문제는 그렇게 네이티브 리소스가 아직 남아있는지 체크하는 과정 자체가 비싼 작업이라는 것입니다. 예를 들어 GetComponent()나 transform 속성 호출이 비싼 작업이라는 것은 잘 알려져있고, 그래서 다음과 같은 코드를 많이 사용하는데, 실제로는 null 체크 비용 때문에 효과가 없었다는 이야기가 있습니다.
+또다른 문제는 그렇게 네이티브 리소스가 아직 남아있는지 체크하는 과정에 비용이 소모된다는 것입니다. 예를 들어 GetComponent()나 transform 속성 호출이 비싼 작업이라는 것은 잘 알려져있고, 그래서 다음과 같은 코드를 많이 사용하는데, 실제로는 null 체크 비용 때문에 효과가 없었다는 이야기가 있습니다.
 
 ```C#
 private Transform _cachedTransform;
 
-public Transform cahcedTransform
+public Transform cachedTransform
 {
     get
     {
