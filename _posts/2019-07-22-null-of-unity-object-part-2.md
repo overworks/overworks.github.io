@@ -6,6 +6,8 @@ tags: [Unity]
 comments: true
 ---
 
+이전글: [유니티 오브젝트의 null 비교 시 유의사항](https://overworks.github.io/unity/2019/07/16/null-of-unity-object.html)
+
 [지난번 글](https://overworks.github.io/unity/2019/07/16/null-of-unity-object.html)에서는 유니티 오브젝트의 fake null과, ==과 != 연산자가 오버로딩되어 있으며 그 때문에 null 비교할 때 일반적인 닷넷 오브젝트보다 많은 비용이 들어간다는 것, 그리고 그것을 피하기 위해서는 object.ReferenceEquals()를 사용하면 된다는 것을 이야기했습니다.
 
 이번에는 잠깐 그 오버로딩된 연산자가 어떻게 구현되어 있는지 보겠습니다. 닷넷 디컴파일러 [ILSpy](https://github.com/icsharpcode/ILSpy)로 유니티 스크립트 어셈블리를 열어[^1] UnityEngine.Object를 찾아보면 다음과 같이 CompareBaseObjects()를 호출하고 있다는 것을 알 수 있습니다.

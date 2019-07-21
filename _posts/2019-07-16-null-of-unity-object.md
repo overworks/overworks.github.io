@@ -6,6 +6,8 @@ tags: [Unity]
 comments: true
 ---
 
+다음글: [유니티 오브젝트의 null 비교 시 유의사항 2](https://overworks.github.io/unity/2019/07/22/null-of-unity-object-part-2.html)
+
 **Update** : null 병합 연산자와 null 조건부 연산자에 대한 서술이 잘못된 점이 있어 수정했습니다. (2019-07-17)
 
 먼저 아래 코드를 봅시다. 임의의 컴포넌트를 Destroy한 후에 null인지 체크하는 간단한 코드입니다. 유니티 버전은 2019.1.6f1, OS는 윈도10 입니다.
