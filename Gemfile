@@ -34,3 +34,4 @@ gem "wdm", "~> 0.1.0" if Gem.win_platform?
 
 # Fix vulnerability
 gem "nokogiri", ">= 1.10.4"
+gem "kramdown", ">= 2.3.0"
