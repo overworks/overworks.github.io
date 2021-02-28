@@ -33,6 +33,6 @@ gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem "wdm", "~> 0.1.0" if Gem.win_platform?
 
 # Fix vulnerability
-gem "nokogiri", ">= 1.10.4"
+gem "nokogiri", ">= 1.11.0"
 gem "kramdown", "~> 2.3.0"
 gem "activesupport", ">= 4.1.11"
