@@ -35,3 +35,4 @@ gem "wdm", "~> 0.1.0" if Gem.win_platform?
 # Fix vulnerabilities
 gem "json", ">= 2.3.0"
 gem "nokogiri", ">= 1.11.4"
+gem "activesupport", ">= 4.1.11"
