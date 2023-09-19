@@ -36,3 +36,5 @@ gem "wdm", "~> 0.1.0" if Gem.win_platform?
 gem "json", ">= 2.3.0"
 gem "nokogiri", ">= 1.11.4"
 gem "activesupport", ">= 4.1.11"
+
+gem "webrick", "~> 1.8"
