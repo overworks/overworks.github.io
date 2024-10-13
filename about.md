@@ -5,7 +5,8 @@ permalink: /about/
 ---
 ## Minhyung Park
 
-A game programmer, with C/C++, C#, Unity3D.
+Game programmer, with C/C++, C#, Unity.
+Web programmer, with JavaScript, Vue, PHP, Laravel, etc.
 
 Living in Seoul, Republic of Korea.
 
@@ -15,3 +16,4 @@ Living in Seoul, Republic of Korea.
 - netmarble Npark (Android, iPhone)
 - Entermate (Android, iPhone)
 - Softon Entertainment (PC)
+- Sejongtf (Web)
