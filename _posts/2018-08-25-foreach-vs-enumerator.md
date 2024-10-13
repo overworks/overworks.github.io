@@ -2,6 +2,7 @@
 layout: post
 title: "그때는 맞고 지금은 틀리다 - enumerator 대신 foreach를 사용하자"
 categories: Unity
+tags: [Unity]
 comments: true
 ---
 ## 더이상 유니티에서는 foreach 시에 가비지를 생성시키지 않는다

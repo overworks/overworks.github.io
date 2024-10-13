@@ -3,6 +3,7 @@ layout: post
 title: "NGUI에서 유니티 UI로의 마이그레이션 팁"
 categories: Unity
 tags: [Unity]
+tags: [Unity, Tip, NGUI]
 comments: true
 ---
 예전에는 유니티로 UI를 만들때 [NGUI](https://assetstore.unity.com/packages/tools/gui/ngui-next-gen-ui-2413)를 많이 사용했습니다. 다른 GUI 툴킷도 있었지만 대부분은 NGUI를 사용했고, 사실상 표준(De Facto)이라고 할 수 있는 상황이었죠. 그러다가 유니티에서 NGUI의 개발자를 영입하고[^1] 4.6에서 새로운 UI 시스템[^2]이 추가됩니다. 초반에는 아무래도 부족한 점이 많았고 소스 변경도 불가능했기 때문에 그대로 NGUI를 쓰는 회사가 많았습니다.

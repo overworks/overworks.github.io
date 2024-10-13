@@ -2,6 +2,7 @@
 layout: post
 title: "그때는 맞고 지금은 틀리다 - 제네릭 컬렉션도 박싱이 발생할 수 있다"
 categories: Unity
+tags: [Unity]
 comments: true
 ---
 ## 제네릭 컬렉션에서 박싱이 발생할 때

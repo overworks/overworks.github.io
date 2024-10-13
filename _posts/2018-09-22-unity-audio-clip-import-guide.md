@@ -1,7 +1,8 @@
 ---
 layout: post
 title: "유니티 오디오 클립 임포트 설정 가이드"
-categories: unity
+categories: Unity
+tags: [Unity, Audio]
 comments: true
 ---
 ## 옵션 설명
